@@ -1,0 +1,95 @@
+<!DOCTYPE web-app [
+        <!ELEMENT web-app (display-name|context-param|listener|servlet|filter|filter-mapping)*>
+        <!ATTLIST web-app
+                xmlns:xsi CDATA #REQUIRED
+                id CDATA #REQUIRED
+                version CDATA #REQUIRED
+                xmlns CDATA #REQUIRED
+                xsi:schemaLocation CDATA #REQUIRED>
+        <!ELEMENT display-name (#PCDATA)>
+        <!ELEMENT context-param (param-name|param-value)*>
+        <!ELEMENT param-name (#PCDATA)>
+        <!ELEMENT param-value (#PCDATA)>
+        <!ELEMENT listener (listener-class)*>
+        <!ELEMENT listener-class (#PCDATA)>
+        <!ELEMENT servlet (servlet-name|servlet-class|init-param)*>
+        <!ELEMENT servlet-name (#PCDATA)>
+        <!ELEMENT servlet-class (#PCDATA)>
+        <!ELEMENT init-param (param-name|param-value)*>
+        <!ELEMENT filter (filter-name|filter-class)*>
+        <!ELEMENT filter-name (#PCDATA)>
+        <!ELEMENT filter-class (#PCDATA)>
+        <!ELEMENT filter-mapping (filter-name|url-pattern)*>
+        <!ELEMENT url-pattern (#PCDATA)>
+        ]>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="WebApp_ID" version="2.4"
+         xmlns="http://java.sun.com/xml/ns/j2ee"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+    <display-name>Restful Web Application</display-name>
+
+    <!-- Auto scan REST service -->
+    <context-param>
+        <param-name>resteasy.scan</param-name>
+        <param-value>true</param-value>
+    </context-param>
+
+    <!-- <context-param>
+      <param-name>resteasy.providers</param-name>
+      <param-value>com.greenspector.modules.codeanalysis.security.SecurityInterceptor</param-value>
+   </context-param>-->
+
+    <context-param>
+        <param-name>resteasy.resources</param-name>
+        <param-value>com.ws.BowlingScoringService</param-value>
+    </context-param>
+
+    <!-- this need same with resteasy servlet url-pattern -->
+
+    <listener>
+        <listener-class>com.ws.RollListener</listener-class>
+    </listener>
+
+    <listener>
+        <listener-class>
+            org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap
+        </listener-class>
+    </listener>
+
+    <servlet>
+        <servlet-name>Resteasy</servlet-name>
+        <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
+        <init-param>
+            <param-name>javax.ws.rs.Application</param-name>
+            <param-value>com.ws.BowlingScoringService</param-value>
+        </init-param>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Resteasy</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+
+
+    <filter>
+        <filter-name>cross-origin</filter-name>
+        <filter-class>org.eclipse.jetty.servlets.CrossOriginFilter</filter-class>
+        <init-param>
+            <param-name>allowedOrigins</param-name>
+            <param-value>*</param-value>
+        </init-param>
+        <init-param>
+            <param-name>allowedMethods</param-name>
+            <param-value>GET,POST,OPTIONS,DELETE,PUT,HEAD</param-value>
+        </init-param>
+        <init-param>
+            <param-name>allowedHeaders</param-name>
+            <param-value>origin, content-type, accept, authorization</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>cross-origin</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+
+</web-app>
