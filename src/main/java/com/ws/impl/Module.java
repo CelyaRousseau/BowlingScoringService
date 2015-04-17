@@ -82,7 +82,6 @@ public class Module implements IModule {
 
          TODO
          - rajouter exception TOUR N°10
-         - Modifier simulateur Pour envoyer un score à la fois (avec un genre de sleep)
          */
 
         Score currentScores = insertScoresInBase(game_id, round_id, user_id, scores);
@@ -121,6 +120,7 @@ public class Module implements IModule {
         return previousRoundPoint != -1;
 
     }
+
     public void calculateRoundPoints(Score currentScore){
         /* TODO : Ajouter Exception TOUR N°10 */
         int[] scoreByRoll = new int[2];
@@ -136,7 +136,6 @@ public class Module implements IModule {
             new ScoreDAO().update(currentScore);
         }
     }
-
 
     public void calculateRoundPoints(Score previousScores, Score currentScores){
         int[] scoreByRoll = new int[2];
@@ -174,7 +173,6 @@ public class Module implements IModule {
         return roundPoints;
     }
 
-
     /**
      * @param fallenKeels int
      * @return isStrike Boolean
@@ -190,5 +188,4 @@ public class Module implements IModule {
     public  boolean isSpare(int [] fallenKeels) {
       return fallenKeels[0] + fallenKeels[1] == 10;
     }
-
 }

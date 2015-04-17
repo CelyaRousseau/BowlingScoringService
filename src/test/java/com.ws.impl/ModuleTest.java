@@ -7,6 +7,8 @@ import com.bowling.entity.Game;
 import com.bowling.entity.Lane;
 import com.bowling.entity.Player;
 import com.bowling.entity.Reservation;
+import com.bowling.util.UtilHibernate;
+import org.hibernate.Session;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -18,8 +20,8 @@ public class ModuleTest {
 
     @Test
     public void insertScores() {
-
-     /*   Lane lane1 = new Lane("piste_1", true);
+        Session session = UtilHibernate.getSessionFactory().getCurrentSession();
+        Lane lane1 = new Lane("piste_1", true);
         Game game = new Game(10, lane1);
 
         Player player1 = new Player();
@@ -34,7 +36,7 @@ public class ModuleTest {
         new LaneDAO().save(lane1);
         new GameDAO().save(game);
         new ReservationDAO().save(res);
-        //new ScoreDAO().save(score1); */
+        //new ScoreDAO().save(score1);
 
     }
 }
