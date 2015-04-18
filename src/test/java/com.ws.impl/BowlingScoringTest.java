@@ -16,7 +16,7 @@ import java.util.Arrays;
 /**
  * Created by Akronys on 23/02/2015.
  */
-public class ModuleTest {
+public class BowlingScoringTest {
 
     @Test
     public void insertScores() {

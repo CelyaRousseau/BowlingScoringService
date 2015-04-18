@@ -5,7 +5,7 @@ import com.rabbitmq.client.*;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.QueueingConsumer;
-import com.ws.impl.Module;
+import com.ws.impl.BowlingScoring;
 
 import java.io.IOException;
 
@@ -42,7 +42,7 @@ public class RollSubscriber implements Runnable {
                 QueueingConsumer.Delivery delivery =  consumer.nextDelivery();
                 String message = new String(delivery.getBody());;
 
-                new Module().Scores(message);
+                new BowlingScoring().Scores(message);
 
                 System.out.println(" [x] Received '" + message + "'");
             }

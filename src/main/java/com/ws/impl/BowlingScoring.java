@@ -14,11 +14,12 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.List;
 
-public class Module implements IModule {
+public class BowlingScoring implements IModule {
 
-    private static  final String SPARE = "spare";
-    private static  final String STRIKE = "strike";
-    private static  final String GENERIC = "generic";
+    private static  final String SPARE             = "spare";
+    private static  final String STRIKE            = "strike";
+    private static  final String GENERIC           = "generic";
+    private static  final String LASTTURNEXCEPTION = "lastTurnException";
 
 
     @Override
@@ -81,7 +82,7 @@ public class Module implements IModule {
          OUT : Nouvelle ligne "Score" en bdd avec les points du Round et/ou round précédent
 
          TODO
-         - rajouter exception TOUR N°10
+         - Exception des Strikes à la suite
          */
 
         Score currentScores = insertScoresInBase(game_id, round_id, user_id, scores);
@@ -92,7 +93,7 @@ public class Module implements IModule {
             }
         }
 
-        calculateRoundPoints(currentScores);
+        calculateRoundPoints(currentScores, round_id);
     }
 
     public Score insertScoresInBase(int game_id, int round_id, int user_id, int [] scores){
@@ -104,9 +105,17 @@ public class Module implements IModule {
         currentScores.setFirstRoll(scores[0]);
         currentScores.setSecondRoll(scores[1]);
 
+        if(isLastTurn(round_id)){
+            currentScores.setThirdRoll(scores[2]);
+        }
+
         new ScoreDAO().save(currentScores);
 
         return currentScores;
+    }
+
+    public boolean isLastTurn(int round_id){
+        return round_id == 10;
     }
 
     public  boolean havePreviousRound(int currentRound){
@@ -121,29 +130,48 @@ public class Module implements IModule {
 
     }
 
-    public void calculateRoundPoints(Score currentScore){
-        /* TODO : Ajouter Exception TOUR N°10 */
-        int[] scoreByRoll = new int[2];
-        scoreByRoll[0]    = currentScore.getFirstRoll();
-        scoreByRoll[1]    = currentScore.getSecondRoll();
+    public void calculateRoundPoints(Score currentScore, int round_id){
+        int[] scoreByRoll = convertScoresToInt(currentScore, round_id);
+        int roundPoints;
 
-        if(isSpare(scoreByRoll) ||isStrike(scoreByRoll[1] )){
-            currentScore.setRoundPoints(-1);
-            new ScoreDAO().update(currentScore);
+        if(isSpare(scoreByRoll) || isStrike(scoreByRoll[1] )){
+            roundPoints = -1;
+            if(isLastTurn(round_id)){
+                roundPoints = calculateRoundPoints(currentScore, LASTTURNEXCEPTION);
+            }
         } else {
-            int roundPoints = calculateRoundPoints(currentScore, GENERIC);
-            currentScore.setRoundPoints(roundPoints);
-            new ScoreDAO().update(currentScore);
+            roundPoints = calculateRoundPoints(currentScore, GENERIC);
         }
+
+        currentScore.setRoundPoints(roundPoints);
+        new ScoreDAO().update(currentScore);
+
     }
 
-    public void calculateRoundPoints(Score previousScores, Score currentScores){
-        int[] scoreByRoll = new int[2];
-        scoreByRoll[0]    = previousScores.getFirstRoll();
-        scoreByRoll[1]    = previousScores.getSecondRoll();
+    private int[] convertScoresToInt(Score scores) {
+        int[] scoreByRoll = new int[3];
+        scoreByRoll[0]    = scores.getFirstRoll();
+        scoreByRoll[1]    = scores.getSecondRoll();
+        scoreByRoll[2]    = 0;
+
+        return scoreByRoll;
+    }
+
+    private int[] convertScoresToInt(Score scores,int round_id) {
+       int [] scoreByRoll = convertScoresToInt(scores);
+
+        if(isLastTurn(round_id)){
+            scoreByRoll[2] = scores.getThirdRoll();
+        }
+
+        return scoreByRoll;
+    }
+
+        public void calculateRoundPoints(Score previousScores, Score currentScores){
+        int[] scoreByRoll = convertScoresToInt(previousScores);
         int roundPoints = 0;
 
-        if(isStrike(scoreByRoll[1])||isStrike(scoreByRoll[0])){
+        if(isStrike(scoreByRoll[1])|| isStrike(scoreByRoll[0])){
             roundPoints = calculateRoundPoints(currentScores, STRIKE);
         } else if(isSpare(scoreByRoll)){
             roundPoints = calculateRoundPoints(currentScores, SPARE);
@@ -155,9 +183,7 @@ public class Module implements IModule {
 
     public int calculateRoundPoints(Score currentScore, String rule){
         int roundPoints   = 0;
-        int[] scoreByRoll = new int[2];
-        scoreByRoll[0]    = currentScore.getFirstRoll();
-        scoreByRoll[1]    = currentScore.getSecondRoll();
+        int[] scoreByRoll = convertScoresToInt(currentScore);
 
         switch (rule){
             case GENERIC:
@@ -168,6 +194,9 @@ public class Module implements IModule {
                 break;
             case STRIKE:
                 roundPoints = 10 + scoreByRoll[0] + scoreByRoll[1];
+                break;
+            case LASTTURNEXCEPTION:
+                roundPoints = scoreByRoll[0] + scoreByRoll[1] + scoreByRoll[2];
                 break;
         }
         return roundPoints;
