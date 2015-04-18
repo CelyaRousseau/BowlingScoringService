@@ -9,7 +9,7 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 
 @Path("/Scores")
-public interface IModule {
+public interface IBowlingScoring {
 
     /** ROUTES EN GET **/
 

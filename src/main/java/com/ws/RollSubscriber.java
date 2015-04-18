@@ -21,8 +21,6 @@ public class RollSubscriber implements Runnable {
     @Override
     public void run() {
 
-        System.out.println("RUN");
-
         try {
             ConnectionFactory factory = new ConnectionFactory();
             factory.setHost("localhost");

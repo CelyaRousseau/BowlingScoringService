@@ -8,13 +8,13 @@ import com.bowling.entity.Player;
 import com.bowling.entity.Score;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ws.itf.IModule;
+import com.ws.itf.IBowlingScoring;
 
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.List;
 
-public class BowlingScoring implements IModule {
+public class BowlingScoring implements IBowlingScoring {
 
     private static  final String SPARE             = "spare";
     private static  final String STRIKE            = "strike";
@@ -65,9 +65,10 @@ public class BowlingScoring implements IModule {
         int round_id = mapper.readTree(json).get("round_id").asInt();
         int user_id = mapper.readTree(json).get("user_id").asInt();
 
-        int[] scores = new int[2];
+        int[] scores = new int[3];
         scores[0] = mapper.readTree(json).get("scores").get(0).asInt();
         scores[1] = mapper.readTree(json).get("scores").get(1).asInt();
+        scores[2] = isLastTurn(round_id) ?  mapper.readTree(json).get("scores").get(2).asInt() : 0;
 
         /** TODO
          IN : Scores d'un Round
@@ -131,14 +132,16 @@ public class BowlingScoring implements IModule {
     }
 
     public void calculateRoundPoints(Score currentScore, int round_id){
-        int[] scoreByRoll = convertScoresToInt(currentScore, round_id);
+        int[] scoreByRoll = convertScoresToInt(currentScore);
         int roundPoints;
 
-        if(isSpare(scoreByRoll) || isStrike(scoreByRoll[1] )){
+        if(isSpare(scoreByRoll) || isStrike(scoreByRoll[1])){
             roundPoints = -1;
             if(isLastTurn(round_id)){
                 roundPoints = calculateRoundPoints(currentScore, LASTTURNEXCEPTION);
+                System.out.println("LastTurn : " + roundPoints);
             }
+            System.out.println("roundpoint : " + roundPoints);
         } else {
             roundPoints = calculateRoundPoints(currentScore, GENERIC);
         }
@@ -152,22 +155,12 @@ public class BowlingScoring implements IModule {
         int[] scoreByRoll = new int[3];
         scoreByRoll[0]    = scores.getFirstRoll();
         scoreByRoll[1]    = scores.getSecondRoll();
-        scoreByRoll[2]    = 0;
+        scoreByRoll[2]    = scores.getThirdRoll();
 
         return scoreByRoll;
     }
 
-    private int[] convertScoresToInt(Score scores,int round_id) {
-       int [] scoreByRoll = convertScoresToInt(scores);
-
-        if(isLastTurn(round_id)){
-            scoreByRoll[2] = scores.getThirdRoll();
-        }
-
-        return scoreByRoll;
-    }
-
-        public void calculateRoundPoints(Score previousScores, Score currentScores){
+    public void calculateRoundPoints(Score previousScores, Score currentScores){
         int[] scoreByRoll = convertScoresToInt(previousScores);
         int roundPoints = 0;
 
