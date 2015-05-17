@@ -8,6 +8,7 @@ import com.bowling.entity.Player;
 import com.bowling.entity.Score;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ws.ScoringPublisher;
 import com.ws.itf.IBowlingScoring;
 
 import javax.ws.rs.core.Response;
@@ -42,7 +43,7 @@ public class BowlingScoring implements IBowlingScoring {
     }
 
     @Override
-    public Response getScoresByGameAndUser(int game_id, int user_id) {
+    public Response getScoresByGameAndUser(int game_id, int user_id) throws JsonProcessingException {
         return null;
     }
 
@@ -95,6 +96,15 @@ public class BowlingScoring implements IBowlingScoring {
         }
 
         calculateRoundPoints(currentScores, round_id);
+
+        // Publish message "Scoring have been update" according to lane
+        try {
+            int lane_id = new GameDAO().get(Game.class, game_id).getLane().getId();
+            String routing_key = "piste_" + lane_id;
+            new ScoringPublisher().publishMessage("Scoring have been update", routing_key);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public Score insertScoresInBase(int game_id, int round_id, int user_id, int [] scores){

@@ -22,10 +22,17 @@
             <artifactId>resteasy-jaxrs</artifactId>
             <version>3.0.11.Final</version>
         </dependency>
+
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlets</artifactId>
             <version>9.3.0.M2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-servlet-initializer</artifactId>
+            <version>3.0.4.Final</version>
         </dependency>
 
         <dependency>

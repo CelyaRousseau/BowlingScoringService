@@ -16,7 +16,7 @@ import java.io.IOException;
  */
 public class RollSubscriber implements Runnable {
 
-    private static final String EXCHANGE_NAME = "logs";
+    private static final String EXCHANGE_NAME = "scoring";
 
     @Override
     public void run() {

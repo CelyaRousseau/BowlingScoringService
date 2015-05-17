@@ -1,6 +1,5 @@
 package com.ws.itf;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import javax.ws.rs.*;
@@ -24,14 +23,14 @@ public interface IBowlingScoring {
     public Response getScoresByUser(@QueryParam("user_id") int user_id);
 
     @GET
-    @Path("/{game_id}")
+    @Path("game/{game_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getScoresByGame(@PathParam("game_id") int game_id) throws JsonProcessingException;
 
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getScoresByGameAndUser(@PathParam("game_id") int game_id, @PathParam("user_id") int user_id);
+    public Response getScoresByGameAndUser(@PathParam("game_id") int game_id, @PathParam("user_id") int user_id) throws JsonProcessingException;
 
     @GET
     @Path("/")
