@@ -99,7 +99,8 @@ public class BowlingScoring implements IBowlingScoring {
 
         // Publish message "Scoring have been update" according to lane
         try {
-            int lane_id = new GameDAO().get(Game.class, game_id).getLane().getId();
+            Game game= new GameDAO().get(Game.class, game_id);
+            int lane_id = game.getLane().getId();
             String routing_key = "piste_" + lane_id;
             new ScoringPublisher().publishMessage("Scoring have been update", routing_key);
         } catch (IOException e) {
